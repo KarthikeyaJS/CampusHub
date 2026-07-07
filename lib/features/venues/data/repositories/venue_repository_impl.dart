@@ -1,0 +1,77 @@
+import 'package:dartz/dartz.dart';
+import '../../../../core/error/exceptions.dart';
+import '../../../../core/error/failure.dart';
+import '../../domain/entities/venue_entity.dart';
+import '../../domain/entities/booking_entity.dart';
+import '../../domain/repositories/venue_repository.dart';
+import '../datasources/venue_remote_datasource.dart';
+import '../datasources/booking_remote_datasource.dart';
+
+class VenueRepositoryImpl implements VenueRepository {
+  final VenueRemoteDataSource venueDataSource;
+  final BookingRemoteDataSource bookingDataSource;
+
+  const VenueRepositoryImpl({
+    required this.venueDataSource,
+    required this.bookingDataSource,
+  });
+
+  @override
+  Stream<List<VenueEntity>> getVenues() => venueDataSource.getVenues();
+
+  @override
+  Future<Either<Failure, VenueEntity>> getVenueById(String id) async {
+    try {
+      final venue = await venueDataSource.getVenueById(id);
+      return Right(venue);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<BookingEntity>>> getBookingsForVenue(
+    String venueId,
+  ) async {
+    try {
+      final bookings = await bookingDataSource.getBookingsForVenue(venueId);
+      return Right(bookings);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BookingEntity>> createBooking({
+    required String venueId,
+    required String venueName,
+    required String purpose,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isFullDay,
+    String? startTime,
+    String? endTime,
+  }) async {
+    try {
+      final booking = await bookingDataSource.createBooking(
+        venueId: venueId,
+        venueName: venueName,
+        purpose: purpose,
+        startDate: startDate,
+        endDate: endDate,
+        isFullDay: isFullDay,
+        startTime: startTime,
+        endTime: endTime,
+      );
+      return Right(booking);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Stream<List<BookingEntity>> getMyBookings(String studentId) =>
+      bookingDataSource.getMyBookings(studentId);
+}
