@@ -19,6 +19,20 @@ abstract class BookingRemoteDataSource {
   });
 
   Stream<List<BookingModel>> getMyBookings(String studentId);
+  Future<BookingModel> getBookingById(String bookingId);
+
+  Future<BookingModel> updateBooking({
+    required String bookingId,
+    required String purpose,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isFullDay,
+    String? startTime,
+    String? endTime,
+    required BookingStatus status,
+  });
+
+  Future<void> cancelBooking(String bookingId);
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
@@ -31,6 +45,58 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   });
 
   CollectionReference get _bookingsRef => firestore.collection('bookings');
+  @override
+  Future<BookingModel> getBookingById(String bookingId) async {
+    try {
+      final doc = await _bookingsRef.doc(bookingId).get();
+      if (!doc.exists) {
+        throw const ServerException('Booking not found.');
+      }
+      return BookingModel.fromJson(doc.id, doc.data() as Map<String, dynamic>);
+    } catch (e) {
+      throw const ServerException('Failed to load booking.');
+    }
+  }
+
+  @override
+  Future<BookingModel> updateBooking({
+    required String bookingId,
+    required String purpose,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isFullDay,
+    String? startTime,
+    String? endTime,
+    required BookingStatus status,
+  }) async {
+    try {
+      await _bookingsRef.doc(bookingId).update({
+        'purpose': purpose,
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate.toIso8601String(),
+        'isFullDay': isFullDay,
+        'startTime': startTime,
+        'endTime': endTime,
+        'status': status.value,
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+      return getBookingById(bookingId);
+    } catch (e) {
+      throw ServerException('Failed to update booking: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> cancelBooking(String bookingId) async {
+    try {
+      await _bookingsRef.doc(bookingId).update({
+        'status': BookingStatus.cancelled.value,
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      throw const ServerException('Failed to cancel booking.');
+    }
+  }
 
   @override
   Future<List<BookingModel>> getBookingsForVenue(String venueId) async {

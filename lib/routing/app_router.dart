@@ -1,5 +1,3 @@
-import 'package:campus_hub/features/complaints/presentation/pages/complaint_detail_page.dart';
-import 'package:campus_hub/features/venues/presentation/pages/venue_list_page.dart';
 import 'package:go_router/go_router.dart';
 import '../di/injection_container.dart';
 import '../core/utils/go_router_refresh_stream.dart';
@@ -11,6 +9,11 @@ import '../features/auth/presentation/cubit/auth_state_cubit/auth_state.dart';
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/complaints/presentation/pages/complaint_list_page.dart';
 import '../features/complaints/presentation/pages/new_complaint_page.dart';
+import '../features/complaints/presentation/pages/complaint_detail_page.dart';
+import '../features/venues/presentation/pages/venue_list_page.dart';
+import '../features/venues/presentation/pages/venue_detail_page.dart';
+import '../features/venues/presentation/pages/my_bookings_page.dart';
+import '../features/venues/presentation/pages/booking_detail_page.dart';
 
 class AppRouter {
   AppRouter._();
@@ -28,22 +31,15 @@ class AppRouter {
           state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
 
-      // Still resolving initial auth check -> stay on splash.
       if (isInitial) {
         return goingToSplash ? null : '/';
       }
-
-      // Not logged in, trying to reach a protected page -> send to login.
       if (!isAuthenticated && !goingToAuth) {
         return '/login';
       }
-
-      // Logged in, but sitting on splash or login/register -> send to home.
       if (isAuthenticated && (goingToSplash || goingToAuth)) {
         return '/home';
       }
-
-      // No redirect needed.
       return null;
     },
     routes: [
@@ -89,6 +85,27 @@ class AppRouter {
         path: '/venues',
         name: 'venues',
         builder: (context, state) => const VenueListPage(),
+      ),
+      GoRoute(
+        path: '/venue/:id',
+        name: 'venueDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return VenueDetailPage(venueId: id);
+        },
+      ),
+      GoRoute(
+        path: '/my-bookings',
+        name: 'myBookings',
+        builder: (context, state) => const MyBookingsPage(),
+      ),
+      GoRoute(
+        path: '/booking/:id',
+        name: 'bookingDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return BookingDetailPage(bookingId: id);
+        },
       ),
     ],
   );

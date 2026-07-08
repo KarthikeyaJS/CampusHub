@@ -34,6 +34,12 @@ import '../features/venues/domain/repositories/venue_repository.dart';
 import '../features/venues/domain/usecases/get_venues_usecase.dart';
 import '../features/venues/domain/usecases/create_booking_usecase.dart';
 import '../features/venues/domain/usecases/get_my_bookings_usecase.dart';
+import '../features/venues/presentation/cubit/venue_detail_cubit/venue_detail_cubit.dart';
+import '../features/venues/domain/usecases/get_booking_by_id_usecase.dart';
+import '../features/venues/domain/usecases/update_booking_usecase.dart';
+import '../features/venues/domain/usecases/cancel_booking_usecase.dart';
+import '../features/venues/presentation/cubit/booking_detail_cubit/booking_detail_cubit.dart';
+import '../features/venues/presentation/cubit/booking_action_cubit/booking_action_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -111,5 +117,16 @@ Future<void> setupDependencies() async {
   sl.registerFactory(() => CreateBookingCubit(sl()));
   sl.registerFactory(
     () => MyBookingsCubit(getMyBookingsUseCase: sl(), firebaseAuth: sl()),
+  );
+  sl.registerFactory(() => VenueDetailCubit(sl()));
+  sl.registerLazySingleton(() => GetBookingByIdUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateBookingUseCase(sl()));
+  sl.registerLazySingleton(() => CancelBookingUseCase(sl()));
+  sl.registerFactory(() => BookingDetailCubit(sl()));
+  sl.registerFactory(
+    () => BookingActionCubit(
+      updateBookingUseCase: sl(),
+      cancelBookingUseCase: sl(),
+    ),
   );
 }

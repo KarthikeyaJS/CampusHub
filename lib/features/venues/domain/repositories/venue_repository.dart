@@ -2,15 +2,13 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
 import '../entities/venue_entity.dart';
 import '../entities/booking_entity.dart';
+import '../entities/booking_status.dart';
 
 abstract class VenueRepository {
-  /// Fetches all active venues (Admin-managed, read-only from mobile app).
   Stream<List<VenueEntity>> getVenues();
 
   Future<Either<Failure, VenueEntity>> getVenueById(String id);
 
-  /// Fetches all non-rejected/cancelled bookings for a venue —
-  /// used to check for conflicts before submitting a new request.
   Future<Either<Failure, List<BookingEntity>>> getBookingsForVenue(
     String venueId,
   );
@@ -26,6 +24,20 @@ abstract class VenueRepository {
     String? endTime,
   });
 
-  /// Real-time stream of the current student's own bookings.
   Stream<List<BookingEntity>> getMyBookings(String studentId);
+
+  Future<Either<Failure, BookingEntity>> getBookingById(String bookingId);
+
+  Future<Either<Failure, BookingEntity>> updateBooking({
+    required String bookingId,
+    required String purpose,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isFullDay,
+    String? startTime,
+    String? endTime,
+    required BookingStatus status,
+  });
+
+  Future<Either<Failure, void>> cancelBooking(String bookingId);
 }

@@ -6,6 +6,7 @@ import '../../domain/entities/booking_entity.dart';
 import '../../domain/repositories/venue_repository.dart';
 import '../datasources/venue_remote_datasource.dart';
 import '../datasources/booking_remote_datasource.dart';
+import '../../domain/entities/booking_status.dart';
 
 class VenueRepositoryImpl implements VenueRepository {
   final VenueRemoteDataSource venueDataSource;
@@ -15,6 +16,55 @@ class VenueRepositoryImpl implements VenueRepository {
     required this.venueDataSource,
     required this.bookingDataSource,
   });
+  @override
+  Future<Either<Failure, BookingEntity>> getBookingById(
+    String bookingId,
+  ) async {
+    try {
+      final booking = await bookingDataSource.getBookingById(bookingId);
+      return Right(booking);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BookingEntity>> updateBooking({
+    required String bookingId,
+    required String purpose,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isFullDay,
+    String? startTime,
+    String? endTime,
+    required BookingStatus status,
+  }) async {
+    try {
+      final booking = await bookingDataSource.updateBooking(
+        bookingId: bookingId,
+        purpose: purpose,
+        startDate: startDate,
+        endDate: endDate,
+        isFullDay: isFullDay,
+        startTime: startTime,
+        endTime: endTime,
+        status: status,
+      );
+      return Right(booking);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> cancelBooking(String bookingId) async {
+    try {
+      await bookingDataSource.cancelBooking(bookingId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
 
   @override
   Stream<List<VenueEntity>> getVenues() => venueDataSource.getVenues();
