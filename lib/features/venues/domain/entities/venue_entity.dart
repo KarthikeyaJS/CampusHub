@@ -9,6 +9,7 @@ class VenueEntity extends Equatable {
   final List<String> amenities;
   final String imageUrl;
   final bool isActive;
+  final String coordinatorId;
 
   const VenueEntity({
     required this.id,
@@ -19,6 +20,7 @@ class VenueEntity extends Equatable {
     required this.amenities,
     required this.imageUrl,
     required this.isActive,
+    required this.coordinatorId,
   });
 
   @override
@@ -31,5 +33,6 @@ class VenueEntity extends Equatable {
     amenities,
     imageUrl,
     isActive,
+    coordinatorId,
   ];
 }

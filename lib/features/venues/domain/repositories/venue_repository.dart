@@ -16,6 +16,7 @@ abstract class VenueRepository {
   Future<Either<Failure, BookingEntity>> createBooking({
     required String venueId,
     required String venueName,
+    required String coordinatorId,
     required String purpose,
     required DateTime startDate,
     required DateTime endDate,
@@ -40,4 +41,13 @@ abstract class VenueRepository {
   });
 
   Future<Either<Failure, void>> cancelBooking(String bookingId);
+
+  Stream<List<BookingEntity>> getBookingsForCoordinator(String coordinatorId);
+
+  Future<Either<Failure, BookingEntity>> approveBooking(String bookingId);
+
+  Future<Either<Failure, BookingEntity>> rejectBooking(
+    String bookingId,
+    String reason,
+  );
 }

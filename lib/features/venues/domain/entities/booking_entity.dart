@@ -16,6 +16,8 @@ class BookingEntity extends Equatable {
   final BookingStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String coordinatorId;
+  final String? rejectionReason;
 
   const BookingEntity({
     required this.id,
@@ -32,6 +34,8 @@ class BookingEntity extends Equatable {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    required this.coordinatorId,
+    this.rejectionReason,
   });
 
   /// Checks if this booking's date+time range overlaps with another's.
@@ -83,5 +87,7 @@ class BookingEntity extends Equatable {
     status,
     createdAt,
     updatedAt,
+    coordinatorId,
+    rejectionReason,
   ];
 }

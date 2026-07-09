@@ -40,18 +40,28 @@ class HomePage extends StatelessWidget {
             Text('Role: $roleLabel', style: AppTextStyles.bodySecondary),
             const SizedBox(height: 24),
             Text('Dashboard coming soon', style: AppTextStyles.bodySecondary),
+
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => context.push('/complaints'),
-              icon: const Icon(Icons.report_problem_outlined),
-              label: const Text('My Complaints'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () => context.push('/venues'),
-              icon: const Icon(Icons.meeting_room_outlined),
-              label: const Text('Book a Venue'),
-            ),
+            if (authState is AuthAuthenticated &&
+                authState.user.role == UserRole.venueCoordinator) ...[
+              ElevatedButton.icon(
+                onPressed: () => context.push('/coordinator/approvals'),
+                icon: const Icon(Icons.fact_check_outlined),
+                label: const Text('Approval Requests'),
+              ),
+            ] else ...[
+              ElevatedButton.icon(
+                onPressed: () => context.push('/complaints'),
+                icon: const Icon(Icons.report_problem_outlined),
+                label: const Text('My Complaints'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () => context.push('/venues'),
+                icon: const Icon(Icons.meeting_room_outlined),
+                label: const Text('Book a Venue'),
+              ),
+            ],
           ],
         ),
       ),

@@ -4,12 +4,6 @@ import '../entities/booking_entity.dart';
 import '../entities/booking_status.dart';
 import '../repositories/venue_repository.dart';
 
-/// Updates an existing booking.
-///
-/// Status rule: if the booking is currently Approved AND the date/time
-/// actually changes, it drops back to Pending for re-approval. A Pending
-/// booking stays Pending regardless. A purpose-only edit on an Approved
-/// booking does NOT require re-approval.
 class UpdateBookingUseCase {
   final VenueRepository repository;
   const UpdateBookingUseCase(this.repository);
@@ -50,6 +44,8 @@ class UpdateBookingUseCase {
           venueName: original.venueName,
           studentId: original.studentId,
           studentName: original.studentName,
+          coordinatorId: original
+              .coordinatorId, // <-- added: fixes missing_required_argument
           purpose: purpose,
           startDate: startDate,
           endDate: endDate,

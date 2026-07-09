@@ -10,6 +10,7 @@ class CreateBookingCubit extends Cubit<CreateBookingState> {
   Future<void> submit({
     required String venueId,
     required String venueName,
+    required String coordinatorId,
     required String purpose,
     required DateTime startDate,
     required DateTime endDate,
@@ -22,6 +23,7 @@ class CreateBookingCubit extends Cubit<CreateBookingState> {
     final result = await createBookingUseCase(
       venueId: venueId,
       venueName: venueName,
+      coordinatorId: coordinatorId,
       purpose: purpose,
       startDate: startDate,
       endDate: endDate,

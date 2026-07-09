@@ -10,6 +10,7 @@ class VenueModel extends VenueEntity {
     required super.amenities,
     required super.imageUrl,
     required super.isActive,
+    required super.coordinatorId,
   });
 
   factory VenueModel.fromJson(String id, Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class VenueModel extends VenueEntity {
       amenities: List<String>.from(json['amenities'] as List? ?? []),
       imageUrl: json['imageUrl'] as String? ?? '',
       isActive: json['isActive'] as bool? ?? true,
+      coordinatorId: json['coordinatorId'] as String? ?? '',
     );
   }
 }

@@ -8,6 +8,7 @@ class BookingModel extends BookingEntity {
     required super.venueName,
     required super.studentId,
     required super.studentName,
+    required super.coordinatorId,
     required super.purpose,
     required super.startDate,
     required super.endDate,
@@ -15,6 +16,7 @@ class BookingModel extends BookingEntity {
     super.startTime,
     super.endTime,
     required super.status,
+    super.rejectionReason,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -26,6 +28,7 @@ class BookingModel extends BookingEntity {
       venueName: json['venueName'] as String,
       studentId: json['studentId'] as String,
       studentName: json['studentName'] as String,
+      coordinatorId: json['coordinatorId'] as String? ?? '',
       purpose: json['purpose'] as String,
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
@@ -33,6 +36,7 @@ class BookingModel extends BookingEntity {
       startTime: json['startTime'] as String?,
       endTime: json['endTime'] as String?,
       status: BookingStatus.fromString(json['status'] as String),
+      rejectionReason: json['rejectionReason'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -44,6 +48,7 @@ class BookingModel extends BookingEntity {
       'venueName': venueName,
       'studentId': studentId,
       'studentName': studentName,
+      'coordinatorId': coordinatorId,
       'purpose': purpose,
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
@@ -51,6 +56,7 @@ class BookingModel extends BookingEntity {
       'startTime': startTime,
       'endTime': endTime,
       'status': status.value,
+      'rejectionReason': rejectionReason,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };

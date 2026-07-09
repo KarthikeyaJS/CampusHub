@@ -15,6 +15,9 @@ import '../features/venues/presentation/pages/venue_detail_page.dart';
 import '../features/venues/presentation/pages/my_bookings_page.dart';
 import '../features/venues/presentation/pages/booking_detail_page.dart';
 
+import '../features/venues/presentation/pages/coordinator_dashboard_page.dart';
+import '../features/venues/presentation/pages/approval_detail_page.dart';
+
 class AppRouter {
   AppRouter._();
 
@@ -105,6 +108,19 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return BookingDetailPage(bookingId: id);
+        },
+      ),
+      GoRoute(
+        path: '/coordinator/approvals',
+        name: 'coordinatorApprovals',
+        builder: (context, state) => const CoordinatorDashboardPage(),
+      ),
+      GoRoute(
+        path: '/approval/:id',
+        name: 'approvalDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return ApprovalDetailPage(bookingId: id);
         },
       ),
     ],

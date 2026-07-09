@@ -145,6 +145,7 @@ class _VenueDetailBodyState extends State<_VenueDetailBody> {
     context.read<CreateBookingCubit>().submit(
       venueId: widget.venue.id,
       venueName: widget.venue.name,
+      coordinatorId: widget.venue.coordinatorId, // <-- add this line
       purpose: _purposeController.text.trim(),
       startDate: _dateRange!.start,
       endDate: _dateRange!.end,
