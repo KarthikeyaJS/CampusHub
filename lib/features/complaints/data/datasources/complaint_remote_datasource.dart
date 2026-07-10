@@ -3,9 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/services/cloudinary_service.dart';
+import '../../../notifications/data/notification_writer.dart';
 import '../../domain/entities/complaint_category.dart';
-import '../models/complaint_model.dart';
 import '../../domain/entities/complaint_status.dart';
+import '../models/complaint_model.dart';
 
 abstract class ComplaintRemoteDataSource {
   Future<ComplaintModel> createComplaint({
@@ -19,17 +20,24 @@ abstract class ComplaintRemoteDataSource {
   Stream<List<ComplaintModel>> getMyComplaints(String studentId);
 
   Future<ComplaintModel> getComplaintById(String id);
+
+  Future<ComplaintModel> updateComplaintStatus({
+    required String complaintId,
+    required ComplaintStatus status,
+  });
 }
 
 class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   final FirebaseFirestore firestore;
   final FirebaseAuth firebaseAuth;
   final CloudinaryService cloudinaryService;
+  final NotificationWriter notificationWriter;
 
   ComplaintRemoteDataSourceImpl({
     required this.firestore,
     required this.firebaseAuth,
     required this.cloudinaryService,
+    required this.notificationWriter,
   });
 
   CollectionReference get _complaintsRef => firestore.collection('complaints');
@@ -50,23 +58,20 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         );
       }
 
-      // 1. Fetch student's name from their user profile
       final userDoc = await firestore
           .collection('users')
           .doc(currentUser.uid)
           .get();
       final studentName = (userDoc.data()?['name'] as String?) ?? 'Unknown';
 
-      // 2. Upload images to Cloudinary (if any provided)
       List<String> imageUrls = [];
       if (imagePaths.isNotEmpty) {
         final files = imagePaths.map((path) => File(path)).toList();
         imageUrls = await cloudinaryService.uploadImages(files);
       }
 
-      // 3. Build complaint document
       final now = DateTime.now();
-      final docRef = _complaintsRef.doc(); // auto-generates an ID
+      final docRef = _complaintsRef.doc();
 
       final complaint = ComplaintModel(
         id: docRef.id,
@@ -83,9 +88,7 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
         updatedAt: now,
       );
 
-      // 4. Save to Firestore
       await docRef.set(complaint.toJson());
-
       return complaint;
     } on AuthException {
       rethrow;
@@ -125,6 +128,33 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
       );
     } catch (e) {
       throw ServerException('Failed to load complaint.');
+    }
+  }
+
+  @override
+  Future<ComplaintModel> updateComplaintStatus({
+    required String complaintId,
+    required ComplaintStatus status,
+  }) async {
+    try {
+      final before = await getComplaintById(complaintId);
+
+      await _complaintsRef.doc(complaintId).update({
+        'status': status.value,
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+
+      await notificationWriter.send(
+        recipientId: before.studentId,
+        type: 'complaint_status',
+        title: 'Complaint Update',
+        body: 'Your complaint "${before.title}" is now ${status.displayName}.',
+        actionRoute: '/complaint/$complaintId',
+      );
+
+      return getComplaintById(complaintId);
+    } catch (e) {
+      throw ServerException('Failed to update complaint: ${e.toString()}');
     }
   }
 }
