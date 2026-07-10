@@ -8,6 +8,11 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../di/injection_container.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../di/injection_container.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit/notifications_cubit.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit/notifications_state.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -25,6 +30,52 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('CampusHub'),
         actions: [
+          BlocProvider(
+            create: (_) => sl<NotificationsCubit>(),
+            child: Builder(
+              builder: (context) {
+                return BlocBuilder<NotificationsCubit, NotificationsState>(
+                  builder: (context, state) {
+                    final unread = state is NotificationsLoaded
+                        ? state.unreadCount
+                        : 0;
+                    return Stack(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.notifications_outlined),
+                          onPressed: () => context.push('/notifications'),
+                        ),
+                        if (unread > 0)
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(
+                                color: AppColors.error,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                unread > 9 ? '9+' : '$unread',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout_outlined),
             onPressed: () => sl<LogoutUseCase>().call(),

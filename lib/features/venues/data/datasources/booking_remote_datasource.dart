@@ -1,96 +1,61 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/error/exceptions.dart';
-import '../../domain/entities/booking_status.dart';
-import '../models/booking_model.dart';
+import '../../../../core/services/cloudinary_service.dart';
+import '../../../notifications/data/notification_writer.dart';
+import '../../domain/entities/complaint_category.dart';
+import '../../domain/entities/complaint_status.dart';
+import '../models/complaint_model.dart';
 
-abstract class BookingRemoteDataSource {
-  Future<List<BookingModel>> getBookingsForVenue(String venueId);
-
-  Future<BookingModel> createBooking({
-    required String venueId,
-    required String venueName,
-    required String coordinatorId,
-    required String purpose,
-    required DateTime startDate,
-    required DateTime endDate,
-    required bool isFullDay,
-    String? startTime,
-    String? endTime,
+abstract class ComplaintRemoteDataSource {
+  Future<ComplaintModel> createComplaint({
+    required String title,
+    String? description,
+    required ComplaintCategory category,
+    String? location,
+    required List<String> imagePaths,
   });
 
-  Stream<List<BookingModel>> getMyBookings(String studentId);
+  Stream<List<ComplaintModel>> getMyComplaints(String studentId);
 
-  Future<BookingModel> getBookingById(String bookingId);
+  Future<ComplaintModel> getComplaintById(String id);
 
-  Future<BookingModel> updateBooking({
-    required String bookingId,
-    required String purpose,
-    required DateTime startDate,
-    required DateTime endDate,
-    required bool isFullDay,
-    String? startTime,
-    String? endTime,
-    required BookingStatus status,
+  Future<ComplaintModel> updateComplaintStatus({
+    required String complaintId,
+    required ComplaintStatus status,
   });
-
-  Future<void> cancelBooking(String bookingId);
-
-  Stream<List<BookingModel>> getBookingsForCoordinator(String coordinatorId);
-
-  Future<BookingModel> approveBooking(String bookingId);
-
-  Future<BookingModel> rejectBooking(String bookingId, String reason);
 }
 
-class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
+class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
   final FirebaseFirestore firestore;
   final FirebaseAuth firebaseAuth;
+  final CloudinaryService cloudinaryService;
+  final NotificationWriter notificationWriter;
 
-  BookingRemoteDataSourceImpl({
+  ComplaintRemoteDataSourceImpl({
     required this.firestore,
     required this.firebaseAuth,
+    required this.cloudinaryService,
+    required this.notificationWriter,
   });
 
-  CollectionReference get _bookingsRef => firestore.collection('bookings');
+  CollectionReference get _complaintsRef => firestore.collection('complaints');
 
   @override
-  Future<List<BookingModel>> getBookingsForVenue(String venueId) async {
-    try {
-      final snapshot = await _bookingsRef
-          .where('venueId', isEqualTo: venueId)
-          .where('status', whereIn: ['pending', 'approved'])
-          .get();
-
-      return snapshot.docs
-          .map(
-            (doc) => BookingModel.fromJson(
-              doc.id,
-              doc.data() as Map<String, dynamic>,
-            ),
-          )
-          .toList();
-    } catch (e) {
-      throw const ServerException('Failed to check venue availability.');
-    }
-  }
-
-  @override
-  Future<BookingModel> createBooking({
-    required String venueId,
-    required String venueName,
-    required String coordinatorId,
-    required String purpose,
-    required DateTime startDate,
-    required DateTime endDate,
-    required bool isFullDay,
-    String? startTime,
-    String? endTime,
+  Future<ComplaintModel> createComplaint({
+    required String title,
+    String? description,
+    required ComplaintCategory category,
+    String? location,
+    required List<String> imagePaths,
   }) async {
     try {
       final currentUser = firebaseAuth.currentUser;
       if (currentUser == null) {
-        throw const AuthException('You must be logged in to book a venue.');
+        throw const AuthException(
+          'You must be logged in to submit a complaint.',
+        );
       }
 
       final userDoc = await firestore
@@ -99,117 +64,49 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           .get();
       final studentName = (userDoc.data()?['name'] as String?) ?? 'Unknown';
 
-      final now = DateTime.now();
-      final docRef = _bookingsRef.doc();
+      List<String> imageUrls = [];
+      if (imagePaths.isNotEmpty) {
+        final files = imagePaths.map((path) => File(path)).toList();
+        imageUrls = await cloudinaryService.uploadImages(files);
+      }
 
-      final booking = BookingModel(
+      final now = DateTime.now();
+      final docRef = _complaintsRef.doc();
+
+      final complaint = ComplaintModel(
         id: docRef.id,
-        venueId: venueId,
-        venueName: venueName,
         studentId: currentUser.uid,
         studentName: studentName,
-        coordinatorId: coordinatorId,
-        purpose: purpose,
-        startDate: startDate,
-        endDate: endDate,
-        isFullDay: isFullDay,
-        startTime: startTime,
-        endTime: endTime,
-        status: BookingStatus.pending,
+        title: title,
+        description: description,
+        category: category,
+        assignedDepartment: category.assignedDepartment,
+        location: location,
+        imageUrls: imageUrls,
+        status: ComplaintStatus.pendingReview,
         createdAt: now,
         updatedAt: now,
       );
 
-      await docRef.set(booking.toJson());
-      return booking;
+      await docRef.set(complaint.toJson());
+      return complaint;
     } on AuthException {
       rethrow;
     } catch (e) {
-      throw ServerException('Failed to submit booking: ${e.toString()}');
+      throw ServerException('Failed to submit complaint: ${e.toString()}');
     }
   }
 
   @override
-  Stream<List<BookingModel>> getMyBookings(String studentId) {
-    return _bookingsRef
+  Stream<List<ComplaintModel>> getMyComplaints(String studentId) {
+    return _complaintsRef
         .where('studentId', isEqualTo: studentId)
-        .orderBy('startDate', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(
-                (doc) => BookingModel.fromJson(
-                  doc.id,
-                  doc.data() as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-        );
-  }
-
-  @override
-  Future<BookingModel> getBookingById(String bookingId) async {
-    try {
-      final doc = await _bookingsRef.doc(bookingId).get();
-      if (!doc.exists) {
-        throw const ServerException('Booking not found.');
-      }
-      return BookingModel.fromJson(doc.id, doc.data() as Map<String, dynamic>);
-    } catch (e) {
-      throw const ServerException('Failed to load booking.');
-    }
-  }
-
-  @override
-  Future<BookingModel> updateBooking({
-    required String bookingId,
-    required String purpose,
-    required DateTime startDate,
-    required DateTime endDate,
-    required bool isFullDay,
-    String? startTime,
-    String? endTime,
-    required BookingStatus status,
-  }) async {
-    try {
-      await _bookingsRef.doc(bookingId).update({
-        'purpose': purpose,
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
-        'isFullDay': isFullDay,
-        'startTime': startTime,
-        'endTime': endTime,
-        'status': status.value,
-        'updatedAt': DateTime.now().toIso8601String(),
-      });
-      return getBookingById(bookingId);
-    } catch (e) {
-      throw ServerException('Failed to update booking: ${e.toString()}');
-    }
-  }
-
-  @override
-  Future<void> cancelBooking(String bookingId) async {
-    try {
-      await _bookingsRef.doc(bookingId).update({
-        'status': BookingStatus.cancelled.value,
-        'updatedAt': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      throw const ServerException('Failed to cancel booking.');
-    }
-  }
-
-  @override
-  Stream<List<BookingModel>> getBookingsForCoordinator(String coordinatorId) {
-    return _bookingsRef
-        .where('coordinatorId', isEqualTo: coordinatorId)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
               .map(
-                (doc) => BookingModel.fromJson(
+                (doc) => ComplaintModel.fromJson(
                   doc.id,
                   doc.data() as Map<String, dynamic>,
                 ),
@@ -219,30 +116,45 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   }
 
   @override
-  Future<BookingModel> approveBooking(String bookingId) async {
+  Future<ComplaintModel> getComplaintById(String id) async {
     try {
-      await _bookingsRef.doc(bookingId).update({
-        'status': BookingStatus.approved.value,
-        'rejectionReason': null,
-        'updatedAt': DateTime.now().toIso8601String(),
-      });
-      return getBookingById(bookingId);
+      final doc = await _complaintsRef.doc(id).get();
+      if (!doc.exists) {
+        throw const ServerException('Complaint not found.');
+      }
+      return ComplaintModel.fromJson(
+        doc.id,
+        doc.data() as Map<String, dynamic>,
+      );
     } catch (e) {
-      throw const ServerException('Failed to approve booking.');
+      throw ServerException('Failed to load complaint.');
     }
   }
 
   @override
-  Future<BookingModel> rejectBooking(String bookingId, String reason) async {
+  Future<ComplaintModel> updateComplaintStatus({
+    required String complaintId,
+    required ComplaintStatus status,
+  }) async {
     try {
-      await _bookingsRef.doc(bookingId).update({
-        'status': BookingStatus.rejected.value,
-        'rejectionReason': reason,
+      final before = await getComplaintById(complaintId);
+
+      await _complaintsRef.doc(complaintId).update({
+        'status': status.value,
         'updatedAt': DateTime.now().toIso8601String(),
       });
-      return getBookingById(bookingId);
+
+      await notificationWriter.send(
+        recipientId: before.studentId,
+        type: 'complaint_status',
+        title: 'Complaint Update',
+        body: 'Your complaint "${before.title}" is now ${status.displayName}.',
+        actionRoute: '/complaint/$complaintId',
+      );
+
+      return getComplaintById(complaintId);
     } catch (e) {
-      throw const ServerException('Failed to reject booking.');
+      throw ServerException('Failed to update complaint: ${e.toString()}');
     }
   }
 }

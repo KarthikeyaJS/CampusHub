@@ -3,6 +3,7 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failure.dart';
 import '../../domain/entities/complaint_entity.dart';
 import '../../domain/entities/complaint_category.dart';
+import '../../domain/entities/complaint_status.dart';
 import '../../domain/repositories/complaint_repository.dart';
 import '../datasources/complaint_remote_datasource.dart';
 
@@ -45,6 +46,22 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
   Future<Either<Failure, ComplaintEntity>> getComplaintById(String id) async {
     try {
       final complaint = await remoteDataSource.getComplaintById(id);
+      return Right(complaint);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ComplaintEntity>> updateComplaintStatus({
+    required String complaintId,
+    required ComplaintStatus status,
+  }) async {
+    try {
+      final complaint = await remoteDataSource.updateComplaintStatus(
+        complaintId: complaintId,
+        status: status,
+      );
       return Right(complaint);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

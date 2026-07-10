@@ -46,6 +46,16 @@ import '../features/venues/domain/usecases/approve_booking_usecase.dart';
 import '../features/venues/domain/usecases/reject_booking_usecase.dart';
 import '../features/venues/presentation/cubit/coordinator_approvals_cubit/coordinator_approvals_cubit.dart';
 import '../features/venues/presentation/cubit/approval_action_cubit/approval_action_cubit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../features/notifications/data/notification_writer.dart';
+import '../features/notifications/data/datasources/notification_remote_datasource.dart';
+import '../features/notifications/data/repositories/notification_repository_impl.dart';
+import '../features/notifications/domain/repositories/notification_repository.dart';
+import '../features/notifications/domain/usecases/get_my_notifications_usecase.dart';
+import '../features/notifications/domain/usecases/mark_notification_read_usecase.dart';
+import '../features/notifications/domain/usecases/mark_all_notifications_read_usecase.dart';
+import '../features/notifications/presentation/cubit/notifications_cubit/notifications_cubit.dart';
+import '../features/complaints/domain/usecases/update_complaint_status_usecase.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -81,15 +91,6 @@ Future<void> setupDependencies() async {
     ),
   );
 
-  // ---- Complaints Feature ----
-  sl.registerLazySingleton<ComplaintRemoteDataSource>(
-    () => ComplaintRemoteDataSourceImpl(
-      firestore: sl(),
-      firebaseAuth: sl(),
-      cloudinaryService: sl(),
-    ),
-  );
-
   sl.registerLazySingleton<ComplaintRepository>(
     () => ComplaintRepositoryImpl(sl()),
   );
@@ -108,7 +109,20 @@ Future<void> setupDependencies() async {
     () => VenueRemoteDataSourceImpl(firestore: sl()),
   );
   sl.registerLazySingleton<BookingRemoteDataSource>(
-    () => BookingRemoteDataSourceImpl(firestore: sl(), firebaseAuth: sl()),
+    () => BookingRemoteDataSourceImpl(
+      firestore: sl(),
+      firebaseAuth: sl(),
+      notificationWriter: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<ComplaintRemoteDataSource>(
+    () => ComplaintRemoteDataSourceImpl(
+      firestore: sl(),
+      firebaseAuth: sl(),
+      cloudinaryService: sl(),
+      notificationWriter: sl(),
+    ),
   );
 
   sl.registerLazySingleton<VenueRepository>(
@@ -151,4 +165,25 @@ Future<void> setupDependencies() async {
       rejectBookingUseCase: sl(),
     ),
   );
+  sl.registerLazySingleton(() => NotificationWriter(sl<FirebaseFirestore>()));
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => GetMyNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => MarkNotificationReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAllNotificationsReadUseCase(sl()));
+  sl.registerFactory(
+    () => NotificationsCubit(
+      getMyNotificationsUseCase: sl(),
+      markNotificationReadUseCase: sl(),
+      markAllNotificationsReadUseCase: sl(),
+      firebaseAuth: sl(),
+    ),
+  );
+
+  // --- Add to Complaints feature block ---
+  sl.registerLazySingleton(() => UpdateComplaintStatusUseCase(sl()));
 }
