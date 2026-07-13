@@ -18,6 +18,8 @@ import '../features/venues/presentation/pages/booking_detail_page.dart';
 import '../features/venues/presentation/pages/coordinator_dashboard_page.dart';
 import '../features/venues/presentation/pages/approval_detail_page.dart';
 import '../features/notifications/presentation/pages/notifications_page.dart';
+import '../features/complaints/presentation/pages/staff_complaint_dashboard_page.dart';
+import '../features/complaints/presentation/pages/staff_complaint_detail_page.dart';
 
 class AppRouter {
   AppRouter._();
@@ -128,6 +130,19 @@ class AppRouter {
         path: '/notifications',
         name: 'notifications',
         builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: '/staff/complaints',
+        name: 'staffComplaints',
+        builder: (context, state) => const StaffComplaintDashboardPage(),
+      ),
+      GoRoute(
+        path: '/staff/complaint/:id',
+        name: 'staffComplaintDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return StaffComplaintDetailPage(complaintId: id);
+        },
       ),
     ],
   );

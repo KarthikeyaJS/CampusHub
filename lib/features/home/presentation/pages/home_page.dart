@@ -3,14 +3,11 @@ import 'package:campus_hub/features/auth/presentation/cubit/auth_state_cubit/aut
 import 'package:campus_hub/features/auth/presentation/cubit/auth_state_cubit/auth_state_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../di/injection_container.dart';
 import '../../../auth/domain/entities/user_role.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../di/injection_container.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit/notifications_cubit.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit/notifications_state.dart';
 
@@ -24,6 +21,7 @@ class HomePage extends StatelessWidget {
         ? _roleLabel(authState.user.role)
         : '';
     final name = authState is AuthAuthenticated ? authState.user.name : '';
+    final role = authState is AuthAuthenticated ? authState.user.role : null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -82,41 +80,60 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Welcome, $name', style: AppTextStyles.h1),
-            const SizedBox(height: 8),
-            Text('Role: $roleLabel', style: AppTextStyles.bodySecondary),
-            const SizedBox(height: 24),
-            Text('Dashboard coming soon', style: AppTextStyles.bodySecondary),
-
-            const SizedBox(height: 24),
-            if (authState is AuthAuthenticated &&
-                authState.user.role == UserRole.venueCoordinator) ...[
-              ElevatedButton.icon(
-                onPressed: () => context.push('/coordinator/approvals'),
-                icon: const Icon(Icons.fact_check_outlined),
-                label: const Text('Approval Requests'),
-              ),
-            ] else ...[
-              ElevatedButton.icon(
-                onPressed: () => context.push('/complaints'),
-                icon: const Icon(Icons.report_problem_outlined),
-                label: const Text('My Complaints'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () => context.push('/venues'),
-                icon: const Icon(Icons.meeting_room_outlined),
-                label: const Text('Book a Venue'),
-              ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Welcome, $name', style: AppTextStyles.h1),
+              const SizedBox(height: 6),
+              Text(roleLabel, style: AppTextStyles.bodySecondary),
+              const SizedBox(height: 32),
+              ..._buildRoleButtons(context, role),
             ],
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildRoleButtons(BuildContext context, UserRole? role) {
+    switch (role) {
+      case UserRole.venueCoordinator:
+        return [
+          _HomeActionButton(
+            icon: Icons.fact_check_outlined,
+            label: 'Approval Requests',
+            onTap: () => context.push('/coordinator/approvals'),
+          ),
+        ];
+      case UserRole.departmentStaff:
+        return [
+          _HomeActionButton(
+            icon: Icons.build_outlined,
+            label: 'Manage Complaints',
+            onTap: () => context.push('/staff/complaints'),
+          ),
+        ];
+      case UserRole.student:
+      case UserRole.admin:
+      case null:
+        return [
+          _HomeActionButton(
+            icon: Icons.report_problem_outlined,
+            label: 'My Complaints',
+            onTap: () => context.push('/complaints'),
+          ),
+          const SizedBox(height: 12),
+          _HomeActionButton(
+            icon: Icons.meeting_room_outlined,
+            label: 'Book a Venue',
+            onTap: () => context.push('/venues'),
+          ),
+        ];
+    }
   }
 
   String _roleLabel(UserRole role) {
@@ -130,5 +147,32 @@ class HomePage extends StatelessWidget {
       case UserRole.admin:
         return 'Admin';
     }
+  }
+}
+
+class _HomeActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _HomeActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          alignment: Alignment.centerLeft,
+        ),
+      ),
+    );
   }
 }

@@ -25,6 +25,8 @@ abstract class ComplaintRemoteDataSource {
     required String complaintId,
     required ComplaintStatus status,
   });
+
+  Stream<List<ComplaintModel>> getComplaintsByDepartment(String department);
 }
 
 class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
@@ -156,5 +158,23 @@ class ComplaintRemoteDataSourceImpl implements ComplaintRemoteDataSource {
     } catch (e) {
       throw ServerException('Failed to update complaint: ${e.toString()}');
     }
+  }
+
+  @override
+  Stream<List<ComplaintModel>> getComplaintsByDepartment(String department) {
+    return _complaintsRef
+        .where('assignedDepartment', isEqualTo: department)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => ComplaintModel.fromJson(
+                  doc.id,
+                  doc.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+        );
   }
 }

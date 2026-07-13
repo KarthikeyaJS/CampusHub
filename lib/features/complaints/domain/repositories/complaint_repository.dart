@@ -21,4 +21,6 @@ abstract class ComplaintRepository {
     required String complaintId,
     required ComplaintStatus status,
   });
+
+  Stream<List<ComplaintEntity>> getComplaintsByDepartment(String department);
 }

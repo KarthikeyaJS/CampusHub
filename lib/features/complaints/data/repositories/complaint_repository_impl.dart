@@ -67,4 +67,9 @@ class ComplaintRepositoryImpl implements ComplaintRepository {
       return Left(ServerFailure(e.message));
     }
   }
+
+  @override
+  Stream<List<ComplaintEntity>> getComplaintsByDepartment(String department) {
+    return remoteDataSource.getComplaintsByDepartment(department);
+  }
 }

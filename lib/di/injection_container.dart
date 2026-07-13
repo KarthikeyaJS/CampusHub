@@ -56,6 +56,9 @@ import '../features/notifications/domain/usecases/mark_notification_read_usecase
 import '../features/notifications/domain/usecases/mark_all_notifications_read_usecase.dart';
 import '../features/notifications/presentation/cubit/notifications_cubit/notifications_cubit.dart';
 import '../features/complaints/domain/usecases/update_complaint_status_usecase.dart';
+import '../features/complaints/domain/usecases/get_complaints_by_department_usecase.dart';
+import '../features/complaints/presentation/cubit/staff_complaints_cubit/staff_complaints_cubit.dart';
+import '../features/complaints/presentation/cubit/complaint_status_action_cubit/complaint_status_action_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -186,4 +189,9 @@ Future<void> setupDependencies() async {
 
   // --- Add to Complaints feature block ---
   sl.registerLazySingleton(() => UpdateComplaintStatusUseCase(sl()));
+  sl.registerLazySingleton(() => GetComplaintsByDepartmentUseCase(sl()));
+  sl.registerFactory(
+    () => StaffComplaintsCubit(getComplaintsByDepartmentUseCase: sl()),
+  );
+  sl.registerFactory(() => ComplaintStatusActionCubit(sl()));
 }
