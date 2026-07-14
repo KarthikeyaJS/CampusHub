@@ -10,7 +10,6 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../di/injection_container.dart';
-import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../venues/domain/entities/venue_entity.dart';
 
@@ -177,8 +176,9 @@ class _VenueFormViewState extends State<_VenueFormView> {
                     keyboardType: TextInputType.number,
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return 'Required';
-                      if (int.tryParse(v.trim()) == null)
+                      if (int.tryParse(v.trim()) == null) {
                         return 'Enter a number';
+                      }
                       return null;
                     },
                   ),
@@ -230,7 +230,7 @@ class _VenueFormViewState extends State<_VenueFormView> {
                       children: [
                         Switch(
                           value: _isActive,
-                          activeColor: AppColors.primary,
+                          activeThumbColor: AppColors.primary,
                           onChanged: (v) => setState(() => _isActive = v),
                         ),
                         Text('Venue is active', style: AppTextStyles.body),

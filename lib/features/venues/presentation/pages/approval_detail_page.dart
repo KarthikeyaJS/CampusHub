@@ -109,8 +109,9 @@ class _DetailBody extends StatelessWidget {
               border: OutlineInputBorder(),
             ),
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'Please provide a reason';
+              }
               return null;
             },
           ),

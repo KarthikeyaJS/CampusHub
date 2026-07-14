@@ -50,7 +50,6 @@ import '../features/venues/domain/usecases/approve_booking_usecase.dart';
 import '../features/venues/domain/usecases/reject_booking_usecase.dart';
 import '../features/venues/presentation/cubit/coordinator_approvals_cubit/coordinator_approvals_cubit.dart';
 import '../features/venues/presentation/cubit/approval_action_cubit/approval_action_cubit.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../features/notifications/data/notification_writer.dart';
 import '../features/notifications/data/datasources/notification_remote_datasource.dart';
 import '../features/notifications/data/repositories/notification_repository_impl.dart';

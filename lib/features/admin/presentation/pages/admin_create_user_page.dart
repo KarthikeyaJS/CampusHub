@@ -135,8 +135,9 @@ class _CreateUserViewState extends State<_CreateUserView> {
                     label: 'Temporary password',
                     obscureText: true,
                     validator: (v) {
-                      if (v == null || v.length < 6)
+                      if (v == null || v.length < 6) {
                         return 'At least 6 characters';
+                      }
                       return null;
                     },
                   ),

@@ -40,12 +40,6 @@ class _SplashPageState extends State<SplashPage>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _controller.forward();
-
-    // TODO: once go_router + auth check are wired, navigate from here
-    // after animation completes + a short hold, e.g.:
-    // Future.delayed(const Duration(milliseconds: 2000), () {
-    //   if (mounted) context.go('/login');
-    // });
   }
 
   @override

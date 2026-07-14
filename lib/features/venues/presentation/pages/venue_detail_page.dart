@@ -198,7 +198,7 @@ class _VenueDetailBodyState extends State<_VenueDetailBody> {
                   width: double.infinity,
                   height: 140,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.08),
+                    color: AppColors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
@@ -256,8 +256,9 @@ class _VenueDetailBodyState extends State<_VenueDetailBody> {
                   label: 'Purpose',
                   hint: 'e.g. Department seminar',
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty)
+                    if (value == null || value.trim().isEmpty) {
                       return 'Please describe the purpose';
+                    }
                     return null;
                   },
                 ),
@@ -299,7 +300,7 @@ class _VenueDetailBodyState extends State<_VenueDetailBody> {
                   children: [
                     Switch(
                       value: _isFullDay,
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                       onChanged: (v) => setState(() => _isFullDay = v),
                     ),
                     Text('Full day booking', style: AppTextStyles.body),

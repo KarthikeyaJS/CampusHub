@@ -269,7 +269,7 @@ class _BookingDetailBodyState extends State<_BookingDetailBody> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.divider.withOpacity(0.4),
+                  color: AppColors.divider.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -345,8 +345,9 @@ class _BookingDetailBodyState extends State<_BookingDetailBody> {
             controller: _purposeController,
             label: 'Purpose',
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'Please describe the purpose';
+              }
               return null;
             },
           ),
@@ -385,7 +386,7 @@ class _BookingDetailBodyState extends State<_BookingDetailBody> {
             children: [
               Switch(
                 value: _isFullDay,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: (v) => setState(() => _isFullDay = v),
               ),
               Text('Full day booking', style: AppTextStyles.body),

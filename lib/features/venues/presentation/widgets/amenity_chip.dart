@@ -11,9 +11,9 @@ class AmenityChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: AppColors.secondary.withOpacity(0.08),
+        color: AppColors.secondary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.secondary.withOpacity(0.25)),
+        border: Border.all(color: AppColors.secondary.withValues(alpha: 0.25)),
       ),
       child: Text(
         label,

@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-
-/// Complaint lifecycle status — matches the Red/Yellow/Orange/Green
-/// system from the project spec.
 enum ComplaintStatus {
   pendingReview('pending_review', 'Pending Review'),
   inProgress('in_progress', 'In Progress'),

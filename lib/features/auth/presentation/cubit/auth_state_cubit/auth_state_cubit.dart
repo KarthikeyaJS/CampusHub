@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/usecases/get_current_user_usecase.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 

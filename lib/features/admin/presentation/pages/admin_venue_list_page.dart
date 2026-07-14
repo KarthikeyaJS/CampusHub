@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -66,7 +65,9 @@ class AdminVenueListPage extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.textSecondary.withOpacity(0.15),
+                              color: AppColors.textSecondary.withValues(
+                                alpha: 0.15,
+                              ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(

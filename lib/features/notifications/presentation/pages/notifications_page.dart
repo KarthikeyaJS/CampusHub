@@ -75,8 +75,9 @@ class NotificationsPage extends StatelessWidget {
                 return NotificationTile(
                   notification: n,
                   onTap: () {
-                    if (!n.isRead)
+                    if (!n.isRead) {
                       context.read<NotificationsCubit>().markAsRead(n.id);
+                    }
                     if (n.actionRoute != null) context.push(n.actionRoute!);
                   },
                 );
