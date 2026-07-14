@@ -117,8 +117,15 @@ class HomePage extends StatelessWidget {
             onTap: () => context.push('/staff/complaints'),
           ),
         ];
-      case UserRole.student:
       case UserRole.admin:
+        return [
+          _HomeActionButton(
+            icon: Icons.admin_panel_settings_outlined,
+            label: 'Admin Panel',
+            onTap: () => context.push('/admin'),
+          ),
+        ];
+      case UserRole.student:
       case null:
         return [
           _HomeActionButton(
