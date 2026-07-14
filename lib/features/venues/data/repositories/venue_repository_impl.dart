@@ -157,4 +157,56 @@ class VenueRepositoryImpl implements VenueRepository {
       return Left(ServerFailure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, VenueEntity>> createVenue({
+    required String name,
+    required String description,
+    required int capacity,
+    required String building,
+    required List<String> amenities,
+    required String coordinatorId,
+  }) async {
+    try {
+      final venue = await venueDataSource.createVenue(
+        name: name,
+        description: description,
+        capacity: capacity,
+        building: building,
+        amenities: amenities,
+        coordinatorId: coordinatorId,
+      );
+      return Right(venue);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, VenueEntity>> updateVenue({
+    required String id,
+    required String name,
+    required String description,
+    required int capacity,
+    required String building,
+    required List<String> amenities,
+    required String coordinatorId,
+    required bool isActive,
+  }) async {
+    try {
+      final venue = await venueDataSource.updateVenue(
+        id: id,
+        name: name,
+        description: description,
+        capacity: capacity,
+        building: building,
+        amenities: amenities,
+        coordinatorId: coordinatorId,
+        isActive: isActive,
+      );
+      return Right(venue);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
 }

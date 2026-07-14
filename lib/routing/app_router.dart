@@ -1,3 +1,4 @@
+import 'package:campus_hub/features/admin/presentation/pages/admin_user_liest_page.dart';
 import 'package:go_router/go_router.dart';
 import '../di/injection_container.dart';
 import '../core/utils/go_router_refresh_stream.dart';
@@ -20,6 +21,13 @@ import '../features/venues/presentation/pages/approval_detail_page.dart';
 import '../features/notifications/presentation/pages/notifications_page.dart';
 import '../features/complaints/presentation/pages/staff_complaint_dashboard_page.dart';
 import '../features/complaints/presentation/pages/staff_complaint_detail_page.dart';
+
+import '../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../features/admin/presentation/pages/admin_create_user_page.dart';
+import '../features/admin/presentation/pages/admin_edit_user_page.dart';
+import '../features/admin/presentation/pages/admin_venue_list_page.dart';
+import '../features/admin/presentation/pages/admin_venue_form_page.dart';
+import '../features/admin/presentation/pages/admin_venue_edit_loader_page.dart';
 
 class AppRouter {
   AppRouter._();
@@ -143,6 +151,43 @@ class AppRouter {
           final id = state.pathParameters['id']!;
           return StaffComplaintDetailPage(complaintId: id);
         },
+      ),
+      GoRoute(
+        path: '/admin',
+        name: 'admin',
+        builder: (context, state) => const AdminDashboardPage(),
+      ),
+      GoRoute(
+        path: '/admin/users',
+        name: 'adminUsers',
+        builder: (context, state) => const AdminUserListPage(),
+      ),
+      GoRoute(
+        path: '/admin/users/new',
+        name: 'adminCreateUser',
+        builder: (context, state) => const AdminCreateUserPage(),
+      ),
+      GoRoute(
+        path: '/admin/users/:id/edit',
+        name: 'adminEditUser',
+        builder: (context, state) =>
+            AdminEditUserPage(uid: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/admin/venues',
+        name: 'adminVenues',
+        builder: (context, state) => const AdminVenueListPage(),
+      ),
+      GoRoute(
+        path: '/admin/venues/new',
+        name: 'adminCreateVenue',
+        builder: (context, state) => const AdminVenueFormPage(),
+      ),
+      GoRoute(
+        path: '/admin/venues/:id/edit',
+        name: 'adminEditVenue',
+        builder: (context, state) =>
+            AdminVenueEditLoaderPage(venueId: state.pathParameters['id']!),
       ),
     ],
   );

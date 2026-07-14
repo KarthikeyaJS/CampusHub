@@ -1,3 +1,7 @@
+import 'package:campus_hub/features/admin/domain/usecases/create_manage_user_usecase.dart';
+import 'package:campus_hub/features/admin/presentation/cubit/admin_users_cubit.dart/admin_users_cubit.dart';
+import 'package:campus_hub/features/admin/presentation/cubit/user_action_cubit.dart/user_action_cubit.dart';
+import 'package:campus_hub/features/admin/presentation/cubit/venue_action_cubit.dart/venue_action_cubit.dart';
 import 'package:campus_hub/features/auth/domain/usecases/register_usecase_student.dart';
 import 'package:campus_hub/features/complaints/presentation/cubit/complaint_detail_cubit/complaint_detail_cubit.dart';
 import 'package:campus_hub/features/venues/domain/usecases/get_venue_by_id_usecase.dart';
@@ -59,6 +63,13 @@ import '../features/complaints/domain/usecases/update_complaint_status_usecase.d
 import '../features/complaints/domain/usecases/get_complaints_by_department_usecase.dart';
 import '../features/complaints/presentation/cubit/staff_complaints_cubit/staff_complaints_cubit.dart';
 import '../features/complaints/presentation/cubit/complaint_status_action_cubit/complaint_status_action_cubit.dart';
+import '../features/admin/data/datasources/admin_remote_datasource.dart';
+import '../features/admin/data/repositories/admin_repository_impl.dart';
+import '../features/admin/domain/repositories/admin_repository.dart';
+import '../features/admin/domain/usecases/get_all_users_usecase.dart';
+import '../features/admin/domain/usecases/update_user_role_usecase.dart';
+import '../features/venues/domain/usecases/create_venue_usecase.dart';
+import '../features/venues/domain/usecases/update_venue_usecase.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -194,4 +205,26 @@ Future<void> setupDependencies() async {
     () => StaffComplaintsCubit(getComplaintsByDepartmentUseCase: sl()),
   );
   sl.registerFactory(() => ComplaintStatusActionCubit(sl()));
+  // --- Admin feature ---
+  sl.registerLazySingleton<AdminRemoteDataSource>(
+    () => AdminRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<AdminRepository>(() => AdminRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => GetAllUsersUseCase(sl()));
+  sl.registerLazySingleton(() => CreateManagedUserUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateUserRoleUseCase(sl()));
+  sl.registerFactory(() => AdminUsersCubit(sl()));
+  sl.registerFactory(
+    () => UserActionCubit(
+      createManagedUserUseCase: sl(),
+      updateUserRoleUseCase: sl(),
+    ),
+  );
+
+  // --- Add to Venues feature block ---
+  sl.registerLazySingleton(() => CreateVenueUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateVenueUseCase(sl()));
+  sl.registerFactory(
+    () => VenueActionCubit(createVenueUseCase: sl(), updateVenueUseCase: sl()),
+  );
 }
