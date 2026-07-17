@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// Primary button with built-in loading spinner state.
-/// Used for all main form-submit actions app-wide.
 class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -20,7 +18,6 @@ class AppButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        // Disable button while loading — prevents double-submit.
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? const SizedBox(

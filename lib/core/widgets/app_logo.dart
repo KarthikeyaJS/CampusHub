@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
-/// Reusable CampusHub logo mark.
-/// A navy rounded-square badge with "CH" monogram — no image asset needed,
-/// so it scales crisply at any size and matches the theme exactly.
 class AppLogo extends StatelessWidget {
   final double size;
   final bool showWordmark;

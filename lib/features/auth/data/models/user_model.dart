@@ -1,8 +1,6 @@
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
 
-/// Data layer's version of UserEntity — adds JSON (de)serialization
-/// for Firestore. Domain layer never imports this; it only knows UserEntity.
 class UserModel extends UserEntity {
   const UserModel({
     required super.uid,
@@ -13,7 +11,6 @@ class UserModel extends UserEntity {
     required super.createdAt,
   });
 
-  /// Builds a UserModel from a Firestore document map.
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       uid: json['uid'] as String,
@@ -24,8 +21,6 @@ class UserModel extends UserEntity {
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
-
-  /// Converts to a map for writing to Firestore.
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,

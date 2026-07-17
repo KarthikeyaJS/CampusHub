@@ -73,11 +73,9 @@ import '../features/venues/domain/usecases/update_venue_usecase.dart';
 final GetIt sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  // ---- External (Firebase SDK instances) ----
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
 
-  // ---- Auth Feature ----
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(firebaseAuth: sl(), firestore: sl()),
   );
@@ -89,14 +87,10 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
 
-  // AuthStateCubit lives for the app's lifetime -> singleton
   sl.registerLazySingleton(() => AuthStateCubit(sl()));
 
-  // LoginCubit/RegisterCubit are per-screen -> new instance each time
   sl.registerFactory(() => LoginCubit(sl()));
   sl.registerFactory(() => RegisterCubit(sl()));
-
-  // ---- Cloudinary ----
   sl.registerLazySingleton(
     () => const CloudinaryService(
       cloudName: CloudinaryConstants.cloudName,
@@ -117,7 +111,6 @@ Future<void> setupDependencies() async {
     () => MyComplaintsCubit(getMyComplaintsUseCase: sl(), firebaseAuth: sl()),
   );
   sl.registerFactory(() => ComplaintDetailCubit(sl()));
-  // ---- Venues & Bookings Feature ----
   sl.registerLazySingleton<VenueRemoteDataSource>(
     () => VenueRemoteDataSourceImpl(firestore: sl()),
   );
@@ -197,7 +190,6 @@ Future<void> setupDependencies() async {
     ),
   );
 
-  // --- Add to Complaints feature block ---
   sl.registerLazySingleton(() => UpdateComplaintStatusUseCase(sl()));
   sl.registerLazySingleton(() => GetComplaintsByDepartmentUseCase(sl()));
   sl.registerFactory(
@@ -219,8 +211,6 @@ Future<void> setupDependencies() async {
       updateUserRoleUseCase: sl(),
     ),
   );
-
-  // --- Add to Venues feature block ---
   sl.registerLazySingleton(() => CreateVenueUseCase(sl()));
   sl.registerLazySingleton(() => UpdateVenueUseCase(sl()));
   sl.registerFactory(

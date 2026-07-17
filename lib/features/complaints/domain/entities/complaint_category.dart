@@ -1,5 +1,3 @@
-/// Complaint categories a student can select. Each maps to a department
-/// for auto-assignment (see categoryToDepartment mapping below).
 enum ComplaintCategory {
   electrical('electrical', 'Electrical'),
   plumbing('plumbing', 'Plumbing'),
@@ -20,8 +18,6 @@ enum ComplaintCategory {
     );
   }
 
-  /// Auto-maps a category to its handling department.
-  /// Used at complaint creation time — student never sees this mapping.
   String get assignedDepartment {
     switch (this) {
       case ComplaintCategory.electrical:

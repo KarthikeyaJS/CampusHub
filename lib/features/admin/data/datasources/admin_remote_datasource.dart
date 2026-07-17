@@ -51,11 +51,6 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     required UserRole role,
     String? department,
   }) async {
-    // Creating a Firebase Auth user via the normal client SDK signs the app
-    // in as that new user, which would kick the Admin out of their own
-    // session. To avoid that, we spin up a throwaway secondary FirebaseApp
-    // instance, do the account creation there, then tear it down — the
-    // Admin's session on the primary FirebaseAuth.instance is never touched.
     FirebaseApp? tempApp;
     try {
       tempApp = await Firebase.initializeApp(
@@ -78,10 +73,6 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
         department: role == UserRole.departmentStaff ? department : null,
         createdAt: DateTime.now(),
       );
-
-      // Written via the PRIMARY Firestore instance, so this happens while
-      // still authenticated as the Admin — required for the security rule
-      // that checks the writer's own role.
       await _usersRef.doc(uid).set(user.toJson());
 
       await tempAuth.signOut();

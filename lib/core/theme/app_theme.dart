@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
-/// The single light ThemeData for CampusHub.
-/// Wire this into MaterialApp(theme: AppTheme.light).
 class AppTheme {
   AppTheme._();
 

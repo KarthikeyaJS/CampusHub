@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/user_entity.dart';
 
-/// Global auth state — reflects whether ANYONE is logged in right now.
-/// Used by the router to decide splash -> login vs splash -> dashboard.
 abstract class AuthState extends Equatable {
   const AuthState();
   @override

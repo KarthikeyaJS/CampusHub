@@ -36,7 +36,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      // 1. Create the Firebase Auth account
       final credential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -44,8 +43,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final uid = credential.user!.uid;
       final now = DateTime.now();
-
-      // 2. Build the user profile (always role=student for self-signup)
       final userModel = UserModel(
         uid: uid,
         email: email,
@@ -55,7 +52,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         createdAt: now,
       );
 
-      // 3. Write profile to Firestore 'users' collection
       await firestore.collection('users').doc(uid).set(userModel.toJson());
 
       return userModel;
@@ -125,7 +121,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     });
   }
 
-  /// Converts Firebase's cryptic error codes into user-friendly messages.
   String _mapFirebaseAuthError(fb_auth.FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':

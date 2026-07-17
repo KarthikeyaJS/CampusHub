@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_text_styles.dart';
 
-/// Reusable styled text field used across all forms (login, register,
-/// complaint form, etc). Keeps input styling consistent app-wide.
 class AppTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
