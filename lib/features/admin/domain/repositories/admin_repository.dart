@@ -19,4 +19,13 @@ abstract class AdminRepository {
     required UserRole role,
     String? department,
   });
+
+  // NEW
+  Future<Either<Failure, void>> updateUserActiveStatus({
+    required String uid,
+    required bool isActive,
+  });
+
+  // NEW
+  Future<Either<Failure, void>> sendPasswordReset(String email);
 }

@@ -8,6 +8,7 @@ class UserModel extends UserEntity {
     required super.name,
     required super.role,
     super.department,
+    super.isActive,
     required super.createdAt,
   });
 
@@ -18,9 +19,13 @@ class UserModel extends UserEntity {
       name: json['name'] as String,
       role: UserRole.fromString(json['role'] as String),
       department: json['department'] as String?,
+      isActive:
+          json['isActive'] as bool? ??
+          true, // default true for existing docs written before this field existed
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,
@@ -28,6 +33,7 @@ class UserModel extends UserEntity {
       'name': name,
       'role': role.value,
       'department': department,
+      'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
     };
   }

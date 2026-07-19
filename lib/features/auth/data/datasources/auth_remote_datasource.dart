@@ -40,9 +40,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         email: email,
         password: password,
       );
-
       final uid = credential.user!.uid;
       final now = DateTime.now();
+
       final userModel = UserModel(
         uid: uid,
         email: email,
@@ -53,7 +53,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       await firestore.collection('users').doc(uid).set(userModel.toJson());
-
       return userModel;
     } on fb_auth.FirebaseAuthException catch (e) {
       throw AuthException(_mapFirebaseAuthError(e));
@@ -72,17 +71,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         email: email,
         password: password,
       );
-
       final uid = credential.user!.uid;
       final doc = await firestore.collection('users').doc(uid).get();
 
       if (!doc.exists) {
+        await firebaseAuth.signOut();
         throw const AuthException('User profile not found. Contact admin.');
       }
 
-      return UserModel.fromJson(doc.data()!);
+      final user = UserModel.fromJson(doc.data()!);
+      if (!user.isActive) {
+        await firebaseAuth.signOut();
+        throw const AuthException(
+          'Your account has been deactivated. Contact an administrator.',
+        );
+      }
+
+      return user;
     } on fb_auth.FirebaseAuthException catch (e) {
       throw AuthException(_mapFirebaseAuthError(e));
+    } on AuthException {
+      rethrow; // NEW: without this, the generic catch below would swallow our own AuthException
+      // (this was a pre-existing latent bug for the "profile not found" case too)
     } catch (e) {
       throw ServerException('Login failed. Please try again.');
     }
@@ -105,7 +115,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final doc = await firestore.collection('users').doc(firebaseUser.uid).get();
     if (!doc.exists) return null;
 
-    return UserModel.fromJson(doc.data()!);
+    final user = UserModel.fromJson(doc.data()!);
+    if (!user.isActive) {
+      await firebaseAuth.signOut();
+      return null;
+    }
+    return user;
   }
 
   @override
@@ -117,7 +132,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .doc(firebaseUser.uid)
           .get();
       if (!doc.exists) return null;
-      return UserModel.fromJson(doc.data()!);
+
+      final user = UserModel.fromJson(doc.data()!);
+      if (!user.isActive) {
+        // Deactivated while a session already existed (e.g. Admin toggled it just now,
+        // or the app was relaunched with a stale session). Force sign-out; this itself
+        // fires another authStateChanges event with a null user right after.
+        firebaseAuth.signOut();
+        return null;
+      }
+      return user;
     });
   }
 

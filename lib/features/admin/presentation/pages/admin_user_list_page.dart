@@ -73,45 +73,63 @@ class _UserTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => context.push('/admin/users/${user.uid}/edit'),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name,
-                      style: AppTextStyles.h3.copyWith(fontSize: 15),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(user.email, style: AppTextStyles.caption),
-                    if (user.department != null) ...[
+        child: Opacity(
+          opacity: user.isActive ? 1.0 : 0.55,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              user.name,
+                              style: AppTextStyles.h3.copyWith(fontSize: 15),
+                            ),
+                          ),
+                          if (!user.isActive) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              '(Inactive)',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.statusRed,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                       const SizedBox(height: 2),
-                      Text(user.department!, style: AppTextStyles.caption),
+                      Text(user.email, style: AppTextStyles.caption),
+                      if (user.department != null) ...[
+                        const SizedBox(height: 2),
+                        Text(user.department!, style: AppTextStyles.caption),
+                      ],
                     ],
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _roleLabel(user.role),
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _roleLabel(user.role),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

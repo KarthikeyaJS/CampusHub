@@ -21,11 +21,21 @@ abstract class AdminRemoteDataSource {
     required UserRole role,
     String? department,
   });
+
+  Future<void> updateUserActiveStatus({
+    required String uid,
+    required bool isActive,
+  }); // NEW
+  Future<void> sendPasswordReset(String email); // NEW
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
   final FirebaseFirestore firestore;
-  AdminRemoteDataSourceImpl({required this.firestore});
+  final FirebaseAuth firebaseAuth; // NEW — needed for sendPasswordResetEmail
+  AdminRemoteDataSourceImpl({
+    required this.firestore,
+    required this.firebaseAuth,
+  });
 
   CollectionReference get _usersRef => firestore.collection('users');
 
@@ -73,6 +83,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
         department: role == UserRole.departmentStaff ? department : null,
         createdAt: DateTime.now(),
       );
+
       await _usersRef.doc(uid).set(user.toJson());
 
       await tempAuth.signOut();
@@ -101,6 +112,31 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       });
     } catch (e) {
       throw const ServerException('Failed to update user.');
+    }
+  }
+
+  @override
+  Future<void> updateUserActiveStatus({
+    required String uid,
+    required bool isActive,
+  }) async {
+    try {
+      await _usersRef.doc(uid).update({'isActive': isActive});
+    } catch (e) {
+      throw const ServerException('Failed to update account status.');
+    }
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw ServerException(
+        e.message ?? 'Failed to send password reset email.',
+      );
+    } catch (e) {
+      throw const ServerException('Failed to send password reset email.');
     }
   }
 }

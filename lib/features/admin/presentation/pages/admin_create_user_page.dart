@@ -80,7 +80,7 @@ class _CreateUserViewState extends State<_CreateUserView> {
               ),
             );
           }
-          if (state is UserActionSuccess) {
+          if (state is UserCreated) {
             showDialog(
               context: context,
               barrierDismissible: false,

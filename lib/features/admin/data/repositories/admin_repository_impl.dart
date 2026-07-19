@@ -52,4 +52,30 @@ class AdminRepositoryImpl implements AdminRepository {
       return Left(ServerFailure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> updateUserActiveStatus({
+    required String uid,
+    required bool isActive,
+  }) async {
+    try {
+      await remoteDataSource.updateUserActiveStatus(
+        uid: uid,
+        isActive: isActive,
+      );
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> sendPasswordReset(String email) async {
+    try {
+      await remoteDataSource.sendPasswordReset(email);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
 }

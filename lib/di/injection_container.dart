@@ -1,4 +1,6 @@
 import 'package:campus_hub/features/admin/domain/usecases/create_manage_user_usecase.dart';
+import 'package:campus_hub/features/admin/domain/usecases/send_password_reset_usecase.dart';
+import 'package:campus_hub/features/admin/domain/usecases/update_user_active_status_usecase.dart';
 import 'package:campus_hub/features/admin/presentation/cubit/admin_users_cubit.dart/admin_users_cubit.dart';
 import 'package:campus_hub/features/admin/presentation/cubit/user_action_cubit.dart/user_action_cubit.dart';
 import 'package:campus_hub/features/admin/presentation/cubit/venue_action_cubit.dart/venue_action_cubit.dart';
@@ -203,8 +205,10 @@ Future<void> setupDependencies() async {
   sl.registerFactory(() => ComplaintStatusActionCubit(sl()));
   // --- Admin feature ---
   sl.registerLazySingleton<AdminRemoteDataSource>(
-    () => AdminRemoteDataSourceImpl(firestore: sl()),
+    () => AdminRemoteDataSourceImpl(firestore: sl(), firebaseAuth: sl()),
   );
+  sl.registerLazySingleton(() => UpdateUserActiveStatusUseCase(sl()));
+  sl.registerLazySingleton(() => SendPasswordResetUseCase(sl()));
   sl.registerLazySingleton<AdminRepository>(() => AdminRepositoryImpl(sl()));
   sl.registerLazySingleton(() => GetAllUsersUseCase(sl()));
   sl.registerLazySingleton(() => CreateManagedUserUseCase(sl()));
@@ -214,6 +218,8 @@ Future<void> setupDependencies() async {
     () => UserActionCubit(
       createManagedUserUseCase: sl(),
       updateUserRoleUseCase: sl(),
+      updateUserActiveStatusUseCase: sl(),
+      sendPasswordResetUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => CreateVenueUseCase(sl()));
