@@ -3,6 +3,7 @@ import 'package:campus_hub/features/reports/presentation/pages/reports_page.dart
 import 'package:go_router/go_router.dart';
 import '../di/injection_container.dart';
 import '../core/utils/go_router_refresh_stream.dart';
+import '../features/auth/domain/entities/user_role.dart';
 import '../features/splash/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
@@ -55,6 +56,26 @@ class AppRouter {
       if (isAuthenticated && (goingToSplash || goingToAuth)) {
         return '/home';
       }
+
+      // --- Role guards ---
+      // Each guard is checked only once we know the user is authenticated,
+      // so `authState.user` below is always safe to access.
+      if (isAuthenticated) {
+        final role = authState.user.role;
+        final location = state.matchedLocation;
+
+        if (location.startsWith('/admin') && role != UserRole.admin) {
+          return '/home';
+        }
+        if (location.startsWith('/coordinator') &&
+            role != UserRole.venueCoordinator) {
+          return '/home';
+        }
+        if (location.startsWith('/staff') && role != UserRole.departmentStaff) {
+          return '/home';
+        }
+      }
+
       return null;
     },
     routes: [

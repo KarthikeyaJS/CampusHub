@@ -28,6 +28,13 @@ class AdminDashboardPage extends StatelessWidget {
               subtitle: 'Add venues and assign coordinators',
               onTap: () => context.push('/admin/venues'),
             ),
+            const SizedBox(height: 14),
+            _AdminTile(
+              icon: Icons.bar_chart_rounded,
+              title: 'Reports & Analytics',
+              subtitle: 'Complaints, bookings, and user stats',
+              onTap: () => context.push('/admin/reports'),
+            ),
           ],
         ),
       ),
@@ -78,13 +85,6 @@ class _AdminTile extends StatelessWidget {
                     Text(subtitle, style: AppTextStyles.bodySecondary),
                   ],
                 ),
-              ),
-              const SizedBox(height: 14),
-              _AdminTile(
-                icon: Icons.bar_chart_rounded,
-                title: 'Reports & Analytics',
-                subtitle: 'Complaints, bookings, and user stats',
-                onTap: () => context.push('/admin/reports'),
               ),
               const Icon(
                 Icons.chevron_right_rounded,

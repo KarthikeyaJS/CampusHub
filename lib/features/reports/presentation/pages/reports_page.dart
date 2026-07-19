@@ -6,7 +6,6 @@ import '../../../../di/injection_container.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../complaints/presentation/utils/status_ui_extension.dart';
 import '../../../venues/presentation/utils/booking_status_ui_extension.dart';
-import '../../domain/entities/analytics_summary_entity.dart';
 import '../cubit/reports_cubit.dart';
 import '../cubit/reports_state.dart';
 import '../widgets/chart_datum.dart';
@@ -81,56 +80,52 @@ class _ReportsView extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () => context.read<ReportsCubit>().load(),
             child: ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
               children: [
-                Text(
-                  'Generated ${summary.generatedAt.hour.toString().padLeft(2, '0')}:'
-                  '${summary.generatedAt.minute.toString().padLeft(2, '0')} · '
-                  '${summary.generatedAt.day}/${summary.generatedAt.month}/${summary.generatedAt.year}',
-                  style: AppTextStyles.caption,
-                ),
-                const SizedBox(height: 16),
+                _GeneratedAtPill(time: summary.generatedAt),
+                const SizedBox(height: 20),
 
-                // --- Overview ---
-                SizedBox(
-                  height: 110,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      StatCard(
-                        label: 'Total Users',
-                        value: '${summary.totalUsers}',
-                        icon: Icons.people_outline_rounded,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      StatCard(
-                        label: 'Total Complaints',
-                        value: '${summary.totalComplaints}',
-                        icon: Icons.report_problem_outlined,
-                        color: AppColors.statusOrange,
-                      ),
-                      const SizedBox(width: 12),
-                      StatCard(
-                        label: 'Total Bookings',
-                        value: '${summary.totalBookings}',
-                        icon: Icons.meeting_room_outlined,
-                        color: AppColors.secondary,
-                      ),
-                      const SizedBox(width: 12),
-                      StatCard(
-                        label: 'Booking Approval Rate',
-                        value:
-                            '${(summary.bookingApprovalRate * 100).round()}%',
-                        icon: Icons.check_circle_outline_rounded,
-                        color: AppColors.statusGreen,
-                      ),
-                    ],
-                  ),
+                // --- Overview: 2x2 grid, height-safe regardless of label length ---
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.1,
+                  children: [
+                    StatCard(
+                      label: 'Total Users',
+                      value: '${summary.totalUsers}',
+                      icon: Icons.people_outline_rounded,
+                      color: AppColors.primary,
+                    ),
+                    StatCard(
+                      label: 'Total Complaints',
+                      value: '${summary.totalComplaints}',
+                      icon: Icons.report_problem_outlined,
+                      color: AppColors.statusOrange,
+                    ),
+                    StatCard(
+                      label: 'Total Bookings',
+                      value: '${summary.totalBookings}',
+                      icon: Icons.meeting_room_outlined,
+                      color: AppColors.secondary,
+                    ),
+                    StatCard(
+                      label: 'Booking Approval Rate',
+                      value: '${(summary.bookingApprovalRate * 100).round()}%',
+                      icon: Icons.check_circle_outline_rounded,
+                      color: AppColors.statusGreen,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
 
-                Text('Complaints', style: AppTextStyles.h2),
+                // const SizedBox(height: 10),
+                const _SectionHeader(
+                  icon: Icons.report_problem_outlined,
+                  title: 'Complaints',
+                ),
                 const SizedBox(height: 12),
                 DonutChartCard(
                   title: 'By Status',
@@ -147,6 +142,7 @@ class _ReportsView extends StatelessWidget {
                 const SizedBox(height: 16),
                 HorizontalBarListCard(
                   title: 'By Category',
+                  maxItems: 7,
                   data: summary.complaintsByCategory.entries
                       .map(
                         (e) => ChartDatum(
@@ -160,6 +156,7 @@ class _ReportsView extends StatelessWidget {
                 const SizedBox(height: 16),
                 HorizontalBarListCard(
                   title: 'By Department',
+                  maxItems: 7,
                   data: summary.complaintsByDepartment.entries
                       .map(
                         (e) => ChartDatum(
@@ -177,7 +174,10 @@ class _ReportsView extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
 
-                Text('Venue Bookings', style: AppTextStyles.h2),
+                const _SectionHeader(
+                  icon: Icons.meeting_room_outlined,
+                  title: 'Venue Bookings',
+                ),
                 const SizedBox(height: 12),
                 DonutChartCard(
                   title: 'By Status',
@@ -194,6 +194,7 @@ class _ReportsView extends StatelessWidget {
                 const SizedBox(height: 16),
                 HorizontalBarListCard(
                   title: 'Most-Booked Venues',
+                  maxItems: 5,
                   data: summary.bookingsByVenue.entries
                       .map(
                         (e) => ChartDatum(
@@ -206,7 +207,10 @@ class _ReportsView extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
 
-                Text('Users', style: AppTextStyles.h2),
+                const _SectionHeader(
+                  icon: Icons.people_outline_rounded,
+                  title: 'Users',
+                ),
                 const SizedBox(height: 12),
                 DonutChartCard(
                   title: 'By Role',
@@ -220,7 +224,6 @@ class _ReportsView extends StatelessWidget {
                       )
                       .toList(),
                 ),
-                const SizedBox(height: 20),
               ],
             ),
           );
@@ -253,5 +256,58 @@ class _ReportsView extends StatelessWidget {
       case UserRole.admin:
         return AppColors.statusGreen;
     }
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  const _SectionHeader({required this.icon, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.textSecondary),
+        const SizedBox(width: 8),
+        Text(title, style: AppTextStyles.h2),
+      ],
+    );
+  }
+}
+
+class _GeneratedAtPill extends StatelessWidget {
+  final DateTime time;
+  const _GeneratedAtPill({required this.time});
+
+  @override
+  Widget build(BuildContext context) {
+    final label =
+        'Generated ${time.hour.toString().padLeft(2, '0')}:'
+        '${time.minute.toString().padLeft(2, '0')} · '
+        '${time.day}/${time.month}/${time.year}';
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.update_rounded,
+              size: 13,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            Text(label, style: AppTextStyles.caption),
+          ],
+        ),
+      ),
+    );
   }
 }
