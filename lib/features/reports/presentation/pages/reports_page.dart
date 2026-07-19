@@ -1,3 +1,4 @@
+import 'package:campus_hub/core/widgets/stat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -11,7 +12,6 @@ import '../cubit/reports_state.dart';
 import '../widgets/chart_datum.dart';
 import '../widgets/donut_chart_card.dart';
 import '../widgets/horizontal_bar_list_card.dart';
-import '../widgets/stat_card.dart';
 import '../widgets/trend_chart_card.dart';
 
 class ReportsPage extends StatelessWidget {
