@@ -79,6 +79,13 @@ class _AdminTile extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 14),
+              _AdminTile(
+                icon: Icons.bar_chart_rounded,
+                title: 'Reports & Analytics',
+                subtitle: 'Complaints, bookings, and user stats',
+                onTap: () => context.push('/admin/reports'),
+              ),
               const Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.textSecondary,

@@ -1,4 +1,5 @@
-import 'package:campus_hub/features/admin/presentation/pages/admin_user_liest_page.dart';
+import 'package:campus_hub/features/admin/presentation/pages/admin_user_list_page.dart';
+import 'package:campus_hub/features/reports/presentation/pages/reports_page.dart';
 import 'package:go_router/go_router.dart';
 import '../di/injection_container.dart';
 import '../core/utils/go_router_refresh_stream.dart';
@@ -188,6 +189,11 @@ class AppRouter {
         name: 'adminEditVenue',
         builder: (context, state) =>
             AdminVenueEditLoaderPage(venueId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/admin/reports',
+        name: 'adminReports',
+        builder: (context, state) => const ReportsPage(),
       ),
     ],
   );

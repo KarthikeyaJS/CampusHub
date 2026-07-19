@@ -206,19 +206,22 @@ class _VenueFormViewState extends State<_VenueFormView> {
                         );
                       }
                       return DropdownButtonFormField<String>(
+                        isExpanded: true,
                         initialValue: _coordinatorId,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                         ),
                         hint: const Text('Select coordinator'),
-                        items: coordinators
-                            .map<DropdownMenuItem<String>>(
-                              (u) => DropdownMenuItem(
-                                value: u.uid,
-                                child: Text('${u.name} (${u.email})'),
-                              ),
-                            )
-                            .toList(),
+                        items: coordinators.map((u) {
+                          return DropdownMenuItem<String>(
+                            value: u.uid,
+                            child: Text(
+                              '${u.name} (${u.email})',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          );
+                        }).toList(),
                         onChanged: (value) =>
                             setState(() => _coordinatorId = value),
                       );
