@@ -33,12 +33,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
     try {
       final snapshot = await firestore.collection('bookings').get();
       return snapshot.docs
-          .map(
-            (doc) => BookingModel.fromJson(
-              doc.id,
-              doc.data() as Map<String, dynamic>,
-            ),
-          )
+          .map((doc) => BookingModel.fromJson(doc.id, doc.data()))
           .toList();
     } catch (e) {
       throw const ServerException(
