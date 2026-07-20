@@ -94,7 +94,7 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
 
-  sl.registerLazySingleton(() => AuthStateCubit(sl()));
+  sl.registerLazySingleton(() => AuthStateCubit(authRepository: sl()));
 
   sl.registerFactory(() => LoginCubit(sl()));
   sl.registerFactory(() => RegisterCubit(sl()));

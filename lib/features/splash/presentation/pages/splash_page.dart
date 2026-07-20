@@ -1,29 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_logo.dart';
 
-/// First screen shown on app launch.
-///
-/// Purely decorative/ambient — navigation away from here is driven by
-/// AuthStateCubit resolving out of AuthInitial (see app_router.dart's
-/// redirect), so this widget never triggers navigation itself.
-///
-/// Visual layers, back to front:
-///   1. Slowly drifting gradient wash
-///   2. Rising particle field (soft "sparks of knowledge")
-///   3. Hovering academic iconography (cap, book, building, etc.)
-///   4. Three layered sine waves anchored to the bottom edge
-///   5. Centered logo with a pulsing glow ring, staggered title/tagline,
-///      and a footer loading indicator
-///
-/// Two AnimationControllers drive all of it:
-///   - _ambientController: loops forever, feeds every continuous motion
-///     (waves, floating icons, particles, glow pulse) via sin() at
-///     different frequencies/phases so nothing looks synchronized.
-///   - _entranceController: plays once, staggers the logo/title/tagline/
-///     loader in via Intervals.
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 

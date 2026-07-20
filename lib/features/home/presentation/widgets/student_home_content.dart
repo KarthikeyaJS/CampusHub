@@ -88,15 +88,17 @@ class StudentHomeContent extends StatelessWidget {
           BlocBuilder<MyComplaintsCubit, MyComplaintsState>(
             builder: (context, state) {
               if (state is MyComplaintsLoading) return const _SectionLoading();
-              if (state is MyComplaintsError)
+              if (state is MyComplaintsError) {
                 return InlineEmptyNote(message: state.message);
+              }
               final complaints =
                   (state as MyComplaintsLoaded).complaints.toList()
                     ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-              if (complaints.isEmpty)
+              if (complaints.isEmpty) {
                 return const InlineEmptyNote(
                   message: "You haven't filed any complaints yet.",
                 );
+              }
               return Column(
                 children: complaints.take(3).map((c) {
                   return Padding(
@@ -128,14 +130,16 @@ class StudentHomeContent extends StatelessWidget {
           BlocBuilder<MyBookingsCubit, MyBookingsState>(
             builder: (context, state) {
               if (state is MyBookingsLoading) return const _SectionLoading();
-              if (state is MyBookingsError)
+              if (state is MyBookingsError) {
                 return InlineEmptyNote(message: state.message);
+              }
               final bookings = (state as MyBookingsLoaded).bookings.toList()
                 ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-              if (bookings.isEmpty)
+              if (bookings.isEmpty) {
                 return const InlineEmptyNote(
                   message: 'Reserve a venue and it will show up here.',
                 );
+              }
               return Column(
                 children: bookings.take(3).map((b) {
                   return Padding(

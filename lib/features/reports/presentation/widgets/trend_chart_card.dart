@@ -61,7 +61,7 @@ class TrendChartCard extends StatelessWidget {
                       dotData: const FlDotData(show: false),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: AppColors.secondary.withOpacity(0.12),
+                        color: AppColors.secondary.withValues(alpha: 0.12),
                       ),
                     ),
                   ],

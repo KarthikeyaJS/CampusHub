@@ -47,7 +47,7 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
     try {
       final snapshot = await firestore.collection('users').get();
       return snapshot.docs
-          .map((doc) => UserModel.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => UserModel.fromJson(doc.data()))
           .toList();
     } catch (e) {
       throw const ServerException('Failed to load user data for the report.');
