@@ -6,11 +6,6 @@ import '../../../../core/widgets/stat_card.dart';
 import '../../../../di/injection_container.dart';
 import '../../../reports/presentation/cubit/reports_cubit.dart';
 import '../../../reports/presentation/cubit/reports_state.dart';
-
-/// Note: this re-runs the same three-collection aggregation Module 8's
-/// Reports page does, every time Home loads — fine at your current scale,
-/// but worth knowing if usage grows: revisit before this becomes a
-/// frequently-hit read-cost concern.
 class AdminHomeContent extends StatelessWidget {
   const AdminHomeContent({super.key});
 
