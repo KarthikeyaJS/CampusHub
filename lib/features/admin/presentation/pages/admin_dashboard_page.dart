@@ -29,12 +29,12 @@ class AdminDashboardPage extends StatelessWidget {
               onTap: () => context.push('/admin/venues'),
             ),
             const SizedBox(height: 14),
-            _AdminTile(
-              icon: Icons.bar_chart_rounded,
-              title: 'Reports & Analytics',
-              subtitle: 'Complaints, bookings, and user stats',
-              onTap: () => context.push('/admin/reports'),
-            ),
+            // _AdminTile(
+            //   icon: Icons.bar_chart_rounded,
+            //   title: 'Reports & Analytics',
+            //   subtitle: 'Complaints, bookings, and user stats',
+            //   onTap: () => context.push('/admin/reports'),
+            // ),
           ],
         ),
       ),
