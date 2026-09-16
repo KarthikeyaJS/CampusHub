@@ -5,12 +5,20 @@ import 'package:campus_hub/features/admin/presentation/cubit/admin_users_cubit.d
 import 'package:campus_hub/features/admin/presentation/cubit/user_action_cubit.dart/user_action_cubit.dart';
 import 'package:campus_hub/features/admin/presentation/cubit/venue_action_cubit.dart/venue_action_cubit.dart';
 import 'package:campus_hub/features/auth/domain/usecases/register_usecase_student.dart';
+import 'package:campus_hub/features/auth/presentation/cubit/auth_state_cubit/auth_state.dart';
 import 'package:campus_hub/features/complaints/presentation/cubit/complaint_detail_cubit/complaint_detail_cubit.dart';
 import 'package:campus_hub/features/reports/data/datasources/reports_remote_datasource.dart';
 import 'package:campus_hub/features/reports/data/repositories/reports_repository_impl.dart';
 import 'package:campus_hub/features/reports/domain/repositories/reports_repository.dart';
 import 'package:campus_hub/features/reports/domain/usecases/get_analytics_summary_usecase.dart';
 import 'package:campus_hub/features/reports/presentation/cubit/reports_cubit.dart';
+import 'package:campus_hub/features/suggestions/data/datasources/suggestion_remote_datasource.dart';
+import 'package:campus_hub/features/suggestions/data/repositories/suggestion_repository_impl.dart';
+import 'package:campus_hub/features/suggestions/domain/repositories/suggestion_repository.dart';
+import 'package:campus_hub/features/suggestions/domain/usecases/create_suggestion_usecase.dart';
+import 'package:campus_hub/features/suggestions/domain/usecases/get_suggestions_stream_usecase.dart';
+import 'package:campus_hub/features/suggestions/domain/usecases/toggle_upvote_usecase.dart';
+import 'package:campus_hub/features/suggestions/presentation/cubit/suggestion_list_cubit/suggestion_list_cubit.dart';
 import 'package:campus_hub/features/venues/domain/usecases/get_venue_by_id_usecase.dart';
 import 'package:campus_hub/features/venues/presentation/cubit/create_booking_cubit/create_booking_cubit.dart';
 import 'package:campus_hub/features/venues/presentation/cubit/my_bookings_cubit/my_booking_cubit.dart';
@@ -235,4 +243,23 @@ Future<void> setupDependencies() async {
   );
   sl.registerLazySingleton(() => GetAnalyticsSummaryUseCase(sl()));
   sl.registerFactory(() => ReportsCubit(sl()));
+  sl.registerLazySingleton<SuggestionRemoteDataSource>(
+    () => SuggestionRemoteDataSourceImpl(firestore: sl()),
+  );
+  sl.registerLazySingleton<SuggestionRepository>(
+    () => SuggestionRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => GetSuggestionsStreamUseCase(sl()));
+  sl.registerLazySingleton(() => CreateSuggestionUseCase(sl()));
+  sl.registerLazySingleton(() => ToggleUpvoteUseCase(sl()));
+
+  sl.registerFactory(() {
+    final authState = sl<AuthStateCubit>().state;
+    final uid = authState is AuthAuthenticated ? authState.user.uid : '';
+    return SuggestionListCubit(
+      getSuggestionsStreamUseCase: sl(),
+      toggleUpvoteUseCase: sl(),
+      currentUserId: uid,
+    );
+  });
 }

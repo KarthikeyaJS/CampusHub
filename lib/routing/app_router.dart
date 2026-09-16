@@ -1,5 +1,8 @@
 import 'package:campus_hub/features/admin/presentation/pages/admin_user_list_page.dart';
 import 'package:campus_hub/features/reports/presentation/pages/reports_page.dart';
+import 'package:campus_hub/features/suggestions/presentation/cubit/suggestion_list_cubit/suggestion_list_cubit.dart';
+import 'package:campus_hub/features/suggestions/presentation/pages/suggestion_list_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../di/injection_container.dart';
 import '../core/utils/go_router_refresh_stream.dart';
@@ -52,9 +55,11 @@ class AppRouter {
       }
       if (!isAuthenticated && !goingToAuth) {
         return '/login';
+        // return '/suggestions';
       }
       if (isAuthenticated && (goingToSplash || goingToAuth)) {
         return '/home';
+        // return '/suggestions';
       }
 
       // --- Role guards ---
@@ -215,6 +220,13 @@ class AppRouter {
         path: '/admin/reports',
         name: 'adminReports',
         builder: (context, state) => const ReportsPage(),
+      ),
+      GoRoute(
+        path: '/suggestions',
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<SuggestionListCubit>(),
+          child: const SuggestionListPage(),
+        ),
       ),
     ],
   );
